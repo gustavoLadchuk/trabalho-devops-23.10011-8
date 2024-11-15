@@ -6,19 +6,21 @@ pipeline {
     }
 
     stages {
-        stage('Test') {
-            steps {
-                
-            }
-        }
 	stage('Build') {
 	    steps {
 	    sh '''
-		docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
-		docker compose up -d --build
+		docker compose build
+		docker compose up -d
 		docker compose ps
 	    '''
 	}
     }
+	 stage('Test') {
+	    steps {
+	    sh '''
+	
+	    '''
+	    }
+	}  
     }
 }
