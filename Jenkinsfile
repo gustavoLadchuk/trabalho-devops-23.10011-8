@@ -10,7 +10,6 @@ pipeline {
 	    steps {
 	    sh '''
 		docker compose down
-		docker rm -v -f $(docker ps -qa)
 		docker compose build
 		docker compose up -d
 		docker compose ps
