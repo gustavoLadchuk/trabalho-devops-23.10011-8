@@ -18,21 +18,21 @@ pipeline {
     }
     stage('Wait for flask') {
         steps {
-            sh '''
+            script {
             def isReady = false
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++) { // Tentativas por 10 segundos
                 try {
                     sh 'curl -X GET http://localhost:5000/alunos'
                     isReady = true
                     break
                 } catch (Exception e) {
-                    sleep(1) 
+                    sleep(1) // Aguarda 1 segundo antes de tentar novamente
                 }
             }
             if (!isReady) {
-                error "A aplicação demorou muito para iniciar"
+                error "Servidor Flask não iniciou a tempo!"
             }
-            '''
+          }
         }
     }
     stage('Test') {
