@@ -12,6 +12,7 @@ import logging
 app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
+
 # Configuração da chave secreta para sessões
 app.config['SECRET_KEY'] = 'minha_chave_secreta_super_secreta'  # Substitua por uma chave segura
 
@@ -27,12 +28,26 @@ appbuilder = AppBuilder(app, db.session)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Função para dropar o banco de dados
+def drop_database():
+    try:
+        engine = db.get_engine()
+        engine.execute("DROP DATABASE IF EXISTS school_db;")  # Droppa o banco, se existir
+        engine.execute("CREATE DATABASE school_db;")         # Recria o banco
+        logger.info("Banco de dados 'school_db' foi removido e recriado com sucesso.")
+    except OperationalError as e:
+        logger.error(f"Erro ao dropar o banco de dados: {e}")
+        raise
+
 # Tentar conectar até o MariaDB estar pronto
 attempts = 5
 for i in range(attempts):
     try:
         with app.app_context():
+            # Dropar e recriar o banco antes de inicializar
+            drop_database()
             db.create_all()  # Inicializa o banco de dados
+
             # Criar um usuário administrador padrão
             if not appbuilder.sm.find_user(username='admin'):
                 appbuilder.sm.add_user(
@@ -78,18 +93,4 @@ appbuilder.add_view(
 @app.route('/alunos', methods=['GET'])
 def listar_alunos():
     alunos = Aluno.query.all()
-    output = [{'id': aluno.id, 'nome': aluno.nome, 'sobrenome': aluno.sobrenome, 'turma': aluno.turma, 'disciplinas': aluno.disciplinas} for aluno in alunos]
-    return jsonify(output)
-
-# Rota para adicionar um aluno - Método POST
-@app.route('/alunos', methods=['POST'])
-def adicionar_aluno():
-    data = request.get_json()
-    novo_aluno = Aluno(nome=data['nome'], sobrenome=data['sobrenome'], turma=data['turma'], disciplinas=data['disciplinas'])
-    db.session.add(novo_aluno)
-    db.session.commit()
-    logger.info(f"Aluno {data['nome']} {data['sobrenome']} adicionado com sucesso!")
-    return jsonify({'message': 'Aluno adicionado com sucesso!'}), 201
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    output = [{'id': aluno.id, 'nome': aluno.nome, 'sobrenome': aluno.sobrenome, 'turma': aluno.turma, 'disciplinas': aluno.disciplinas} for aluno in alunos
