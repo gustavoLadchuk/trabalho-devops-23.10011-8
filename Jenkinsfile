@@ -16,13 +16,30 @@ pipeline {
 	    '''
 	}
     }
-	 stage('Test') {
-	    steps {
-	    sh '''
-		echo "Testando método GET
+    stage('Wait for flask') {
+        steps {
+            sh '''
+            def isReady = false
+            for (int i = 0; i < 10; i++) {
+                try {
+                    sh 'curl -X GET http://localhost:5000/alunos'
+                    isReady = true
+                    break
+                } catch (Exception e) {
+                    sleep(1) 
+                }
+            }
+            if (!isReady) {
+                error "A aplicação demorou muito para iniciar"
+            }
+            '''
+        }
+    }
+    stage('Test') {
+    steps {
+	 sh '''
 		curl -X GET http://localhost:5000/alunos
 
-		echo "Testando método POST
 		curl -X POST http://localhost:5000/alunos \
 	    -H "Content-Type: application/json" \
      -d '{
