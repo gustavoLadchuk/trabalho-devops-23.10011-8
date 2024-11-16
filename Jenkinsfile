@@ -19,7 +19,6 @@ pipeline {
 	 stage('Test') {
 	    steps {
 	    sh '''
-		docker-compose logs -f mariadb
 		docker-compose logs -f flask_app			
 	    '''
 	    }
