@@ -1,6 +1,5 @@
-# Código principal do Flask (app.py)
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_appbuilder import AppBuilder, SQLA
 from flask_appbuilder.models.sqla.interface import SQLAInterface
@@ -11,7 +10,9 @@ import logging
 
 app = Flask(__name__)
 
+# Inicializar PrometheusMetrics para coletar métricas automaticamente
 metrics = PrometheusMetrics(app)
+
 # Configuração da chave secreta para sessões
 app.config['SECRET_KEY'] = 'minha_chave_secreta_super_secreta'  # Substitua por uma chave segura
 
@@ -73,6 +74,16 @@ appbuilder.add_view(
     icon="fa-folder-open-o",
     category="Alunos",
 )
+
+@app.route('/metrics')
+def metrics_endpoint():
+    result = db.session.execute('SHOW STATUS LIKE "Threads_connected";').fetchone()
+    threads_connected = result[1] if result else 0
+    custom_metric = f"# TYPE mariadb_threads_connected gauge\nmariadb_threads_connected {threads_connected}\n"
+    result = db.session.execute('SHOW STATUS LIKE "Queries";').fetchone()
+    queries = result[1] if result else 0
+    custom_metric += f"# TYPE mariadb_queries gauge\nmariadb_queries {queries}\n"
+    return Response(custom_metric, mimetype="text/plain")
 
 # Rota para listar todos os alunos - Método GET
 @app.route('/alunos', methods=['GET'])
