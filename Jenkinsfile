@@ -38,6 +38,7 @@ pipeline {
     stage('Test') {
     steps {
 	 sh '''
+		docker exec -it flask /bin/bash
 		pytest tests/test_app.py				
 	    '''
 	    }
