@@ -38,8 +38,6 @@ pipeline {
     stage('Test') {
     steps {
 	 sh '''
-		curl -X GET http://localhost:5000/alunos
-
 		curl -X POST http://localhost:5000/alunos \
 	    -H "Content-Type: application/json" \
      -d '{
@@ -48,6 +46,8 @@ pipeline {
            "turma": "Teste",
            "disciplinas": "Teste1, Teste2"
          }'
+
+		curl -X GET http://localhost:5000/alunos
 	    '''
 	    }
 	}  
