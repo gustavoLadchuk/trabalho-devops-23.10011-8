@@ -38,16 +38,6 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
 
-  mysql-exporter:
-    container_name: mysql_exporter
-    image: prom/mysqld-exporter
-    volumes:
-      - "./.my.cnf:/cfg/.my.cnf"
-    ports:
-      - 9104:9104
-    depends_on:
-      - mariadb
-
   grafana:
     container_name: grafana
     build:
