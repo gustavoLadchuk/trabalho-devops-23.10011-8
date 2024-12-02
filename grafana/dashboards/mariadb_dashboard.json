@@ -145,41 +145,6 @@
       "linewidth": 2,
       "points": false,
       "pointradius": 2
-    },
-    {
-      "type": "graph",
-      "title": "Flask HTTP Requests",
-      "datasource": "Prometheus",
-      "gridPos": {
-        "x": 0,
-        "y": 40,
-        "w": 24,
-        "h": 10
-      },
-      "targets": [
-        {
-          "expr": "flask_http_request_total",
-          "legendFormat": "Total Requests",
-          "refId": "E"
-        }
-      ],
-      "xaxis": {
-        "show": true
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "show": true
-        },
-        {
-          "show": true
-        }
-      ],
-      "lines": true,
-      "fill": 1,
-      "linewidth": 2,
-      "points": false,
-      "pointradius": 2
     }
   ],
   "refresh": "10s",
